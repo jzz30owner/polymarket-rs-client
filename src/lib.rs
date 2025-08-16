@@ -28,7 +28,7 @@ pub use data::*;
 pub use eth_utils::EthSigner;
 use headers::{create_l1_headers, create_l2_headers};
 
-use crate::orders::SigType;
+pub use crate::orders::SigType;
 
 #[derive(Default)]
 pub struct ClobClient {
