@@ -1,5 +1,5 @@
 use alloy_primitives::hex::encode_prefixed;
-use alloy_primitives::Address;
+pub use alloy_primitives::Address;
 pub use alloy_primitives::U256;
 use alloy_signer_local::PrivateKeySigner;
 pub use anyhow::{anyhow, Context, Result as ClientResult};
