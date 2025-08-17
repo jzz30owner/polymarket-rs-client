@@ -34,13 +34,12 @@ where
         Some(s) => {
             // We format like str(dict) in python
             let s = JsonFormat::new()
-                .comma(", ")?
-                .colon(": ")?
+                .comma(",")?
+                .colon(":")?
                 .format_to_string(&s)?;
             format!("{timestamp}{method}{req_path}{s}")
         }
     };
-
     let mut mac = HmacSha256::new_from_slice(&decoded).context("HMAC init error")?;
     mac.update(message.as_bytes());
 
