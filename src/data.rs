@@ -243,7 +243,7 @@ impl Default for ExtraOrderArgs {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct CreateOrderOptions {
     pub tick_size: Option<Decimal>,
     pub neg_risk: Option<bool>,

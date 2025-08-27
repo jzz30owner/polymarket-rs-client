@@ -382,9 +382,13 @@ impl ClobClient {
     ) -> ClientResult<SignedOrderRequest> {
         let (_, chain_id) = self.get_l1_parameters();
 
-        let create_order_options = self
+        let create_order_options: CreateOrderOptions = match options {
+            Some(o) => o.clone(),
+            None => self
             .get_filled_order_options(order_args.token_id.as_ref(), options)
-            .await?;
+            .await?
+        };
+        
         let expiration = expiration.unwrap_or(0);
         let extras = extras.unwrap_or_default();
 
