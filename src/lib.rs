@@ -52,7 +52,7 @@ impl ClobClient {
             ..Default::default()
         }
     }
-    pub fn with_l1_headers(host: &str, key: &str, chain_id: u64) -> Self {
+    pub fn with_l1_headers(host: &str, key: &str, chain_id: u64, sig_type: Option<SigType>, funder: Option<Address>) -> Self {
         let signer = Box::new(
             key.parse::<PrivateKeySigner>()
                 .expect("Invalid private key"),
@@ -63,7 +63,7 @@ impl ClobClient {
             signer: Some(signer.clone()),
             chain_id: Some(chain_id),
             api_creds: None,
-            order_builder: Some(OrderBuilder::new(signer, None, None)),
+            order_builder: Some(OrderBuilder::new(signer, sig_type, funder)),
         }
     }
 
