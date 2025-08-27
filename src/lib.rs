@@ -1,4 +1,5 @@
 use alloy_primitives::hex::encode_prefixed;
+use alloy_primitives::Address;
 pub use alloy_primitives::U256;
 use alloy_signer_local::PrivateKeySigner;
 pub use anyhow::{anyhow, Context, Result as ClientResult};
@@ -26,6 +27,8 @@ mod utils;
 pub use data::*;
 pub use eth_utils::EthSigner;
 use headers::{create_l1_headers, create_l2_headers};
+
+use crate::orders::SigType;
 
 #[derive(Default)]
 pub struct ClobClient {
@@ -64,7 +67,7 @@ impl ClobClient {
         }
     }
 
-    pub fn with_l2_headers(host: &str, key: &str, chain_id: u64, api_creds: ApiCreds) -> Self {
+    pub fn with_l2_headers(host: &str, key: &str, chain_id: u64, api_creds: ApiCreds, sig_type: Option<SigType>, funder: Option<Address>) -> Self {
         let signer = Box::new(
             key.parse::<PrivateKeySigner>()
                 .expect("Invalid private key"),
@@ -75,7 +78,7 @@ impl ClobClient {
             signer: Some(signer.clone()),
             chain_id: Some(chain_id),
             api_creds: Some(api_creds),
-            order_builder: Some(OrderBuilder::new(signer, None, None)),
+            order_builder: Some(OrderBuilder::new(signer, sig_type, funder)),
         }
     }
     pub fn set_api_creds(&mut self, api_creds: ApiCreds) {
