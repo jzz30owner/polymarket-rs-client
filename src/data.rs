@@ -321,7 +321,7 @@ pub struct BookParams {
     pub side: Side,
 }
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct ApiCreds {
     #[serde(rename = "apiKey")]
     pub api_key: String,
