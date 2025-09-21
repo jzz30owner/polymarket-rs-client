@@ -11,6 +11,8 @@ use reqwest::Client;
 use reqwest::Method;
 use reqwest::RequestBuilder;
 use rust_decimal::Decimal;
+use serde::de::DeserializeOwned;
+use serde::Deserialize;
 pub use serde_json::Value;
 use std::collections::HashMap;
 
@@ -576,6 +578,17 @@ impl ClobClient {
         params: Option<&OpenOrderParams>,
         next_cursor: Option<&str>,
     ) -> ClientResult<Vec<OpenOrder>> {
+        self.get_orders_custom::<OpenOrder>(params, next_cursor).await
+    }
+
+    pub async fn get_orders_custom<T>(
+        &self,
+        params: Option<&OpenOrderParams>,
+        next_cursor: Option<&str>,
+    ) -> ClientResult<Vec<T>> 
+    where 
+        T : DeserializeOwned
+    {
         let (signer, creds) = self.get_l2_parameters();
         let method = Method::GET;
         let endpoint = "/data/orders";
@@ -609,7 +622,7 @@ impl ClobClient {
             next_cursor = new_cursor;
 
             let results = resp["data"].clone();
-            let o = serde_json::from_value::<Vec<OpenOrder>>(results)
+            let o = serde_json::from_value::<Vec<T>>(results)
                 .expect("Failed to parse data from order response");
             output.extend(o);
         }
@@ -617,6 +630,14 @@ impl ClobClient {
     }
 
     pub async fn get_order(&self, order_id: &str) -> ClientResult<OpenOrder> {
+        self.get_order_custom::<OpenOrder>(order_id).await
+    }
+
+    pub async fn get_order_custom<T>(&self, order_id: &str) 
+    -> ClientResult<T> 
+    where 
+        T : DeserializeOwned
+    {
         let (signer, creds) = self.get_l2_parameters();
         let method = Method::GET;
         let endpoint = &format!("/data/order/{order_id}");
@@ -625,7 +646,7 @@ impl ClobClient {
 
         let req = self.create_request_with_headers(method, endpoint, headers.into_iter());
 
-        Ok(req.send().await?.json::<OpenOrder>().await?)
+        Ok(req.send().await?.json::<T>().await?)
     }
 
     pub async fn get_last_trade_price(&self, token_id: &str) -> ClientResult<Value> {
