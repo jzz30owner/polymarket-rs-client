@@ -510,9 +510,9 @@ impl ClobClient {
         Ok(req.json(&body).send().await?.json::<Value>().await?)
     }
 
-    pub async fn create_and_post_order(&self, order_args: &OrderArgs) -> ClientResult<Value> {
+    pub async fn create_and_post_order(&self, order_args: &OrderArgs, order_type: OrderType) -> ClientResult<Value> {
         let order = self.create_order(order_args, None, None, None).await?;
-        self.post_order(order, OrderType::GTC).await
+        self.post_order(order, order_type).await
     }
 
     pub async fn cancel(&self, order_id: &str) -> ClientResult<Value> {
