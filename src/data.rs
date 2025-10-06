@@ -205,6 +205,7 @@ pub struct OrderBookSummary {
 pub struct MarketOrderArgs {
     pub token_id: String,
     pub amount: Decimal,
+    pub price: Decimal
 }
 
 #[derive(Debug, Deserialize)]
