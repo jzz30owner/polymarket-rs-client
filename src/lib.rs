@@ -24,7 +24,7 @@ mod config;
 mod data;
 mod eth_utils;
 mod headers;
-mod orders;
+pub mod orders;
 mod utils;
 
 pub use data::*;
