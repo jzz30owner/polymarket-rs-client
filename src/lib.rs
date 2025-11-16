@@ -11,6 +11,7 @@ use reqwest::Client;
 use reqwest::Method;
 use reqwest::RequestBuilder;
 use rust_decimal::Decimal;
+use rust_decimal::prelude::Zero;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
@@ -480,9 +481,15 @@ impl ClobClient {
         };
 
         let extras = extras.unwrap_or_default();
-        let price = self
+
+        let price =  if order_args.price == Decimal::zero() {
+            self
             .calculate_market_price(&order_args.token_id, Side::BUY, order_args.amount)
-            .await?;
+            .await?
+        } else {
+            order_args.price
+        };
+
         if !self.is_price_in_range(
             price,
             create_order_options.tick_size.expect("Should be filled"),
