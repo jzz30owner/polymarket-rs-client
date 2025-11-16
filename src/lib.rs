@@ -11,6 +11,7 @@ use reqwest::Client;
 use reqwest::Method;
 use reqwest::RequestBuilder;
 use rust_decimal::Decimal;
+use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 pub use serde_json::Value;
@@ -23,7 +24,7 @@ mod config;
 mod data;
 mod eth_utils;
 mod headers;
-mod orders;
+pub mod orders;
 mod utils;
 
 pub use data::*;
@@ -511,6 +512,24 @@ impl ClobClient {
         let req = self.create_request_with_headers(method, endpoint, headers.into_iter());
 
         Ok(req.json(&body).send().await?.json::<Value>().await?)
+    }
+
+    pub async fn custom_post_order<T>(
+        &self,
+        order: SignedOrderRequest,
+        order_type: OrderType,
+    ) -> ClientResult<T> where T : DeserializeOwned {
+        let (signer, creds) = self.get_l2_parameters();
+        let body = PostOrder::new(order, creds.api_key.clone(), order_type);
+
+        let method = Method::POST;
+        let endpoint = "/order";
+
+        let headers = create_l2_headers(signer, creds, method.as_str(), endpoint, Some(&body))?;
+
+        let req = self.create_request_with_headers(method, endpoint, headers.into_iter());
+
+        Ok(req.json(&body).send().await?.json::<T>().await?)
     }
 
     pub async fn create_and_post_order(&self, order_args: &OrderArgs, order_type: OrderType) -> ClientResult<Value> {
