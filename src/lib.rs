@@ -22,7 +22,7 @@ use std::collections::HashMap;
 // mod tests;
 
 mod config;
-pub mod data;
+mod data;
 mod eth_utils;
 mod headers;
 pub mod orders;

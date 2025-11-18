@@ -201,7 +201,7 @@ pub struct OrderBookSummary {
     pub asks: Vec<OrderSummary>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MarketOrderArgs {
     pub token_id: String,
     pub amount: Decimal,
@@ -227,7 +227,7 @@ impl OrderArgs {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExtraOrderArgs {
     pub fee_rate_bps: u32,
     pub nonce: U256,
@@ -244,7 +244,7 @@ impl Default for ExtraOrderArgs {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct CreateOrderOptions {
     pub tick_size: Option<Decimal>,
     pub neg_risk: Option<bool>,
