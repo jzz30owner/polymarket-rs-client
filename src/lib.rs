@@ -418,6 +418,36 @@ impl ClobClient {
             )
     }
 
+    pub fn create_order_flat(
+        &self,
+        order_args: &OrderArgs,
+        expiration: Option<u64>,
+        extras: ExtraOrderArgs,
+        options: CreateOrderOptions,
+    ) -> ClientResult<SignedOrderRequest> {
+        let (_, chain_id) = self.get_l1_parameters();
+
+        let expiration = expiration.unwrap_or(0);
+ 
+        if !self.is_price_in_range(
+            order_args.price,
+            options.tick_size.expect("Should be filled"),
+        ) {
+            return Err(anyhow!("Price is not in range of tick_size"));
+        }
+
+        self.order_builder
+            .as_ref()
+            .expect("OrderBuilder not set")
+            .create_order(
+                chain_id,
+                order_args,
+                expiration,
+                &extras,
+                options,
+            )
+    }
+
     pub async fn get_order_book(&self, token_id: &str) -> ClientResult<OrderBookSummary> {
         Ok(self
             .http_client
@@ -501,6 +531,25 @@ impl ClobClient {
             .as_ref()
             .expect("OrderBuilder not set")
             .create_market_order(chain_id, order_args, price, &extras, create_order_options)
+    }
+
+    pub fn create_market_order_flat(
+        &self,
+        order_args: &MarketOrderArgs,
+        extras: ExtraOrderArgs,
+        options: CreateOrderOptions,
+    ) -> ClientResult<SignedOrderRequest> {
+        let (_, chain_id) = self.get_l1_parameters();
+        if !self.is_price_in_range(
+            order_args.price,
+            options.tick_size.expect("Should be filled"),
+        ) {
+            return Err(anyhow!("Price is not in range of tick_size"));
+        }
+        self.order_builder
+            .as_ref()
+            .expect("OrderBuilder not set")
+            .create_market_order(chain_id, order_args, order_args.price, &extras, options)
     }
 
     pub async fn post_order(
