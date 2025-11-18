@@ -182,7 +182,7 @@ impl PostOrder {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct OrderArgs {
     pub token_id: String,
     pub price: Decimal,
