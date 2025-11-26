@@ -17,6 +17,7 @@ use serde::de::DeserializeOwned;
 use serde::Deserialize;
 pub use serde_json::Value;
 use std::collections::HashMap;
+use std::fmt::format;
 
 // #[cfg(test)]
 // mod tests;
@@ -604,8 +605,14 @@ impl ClobClient {
         let headers = create_l2_headers(signer, creds, method.as_str(), endpoint, Some(&body))?;
 
         let req = self.create_request_with_headers(method, endpoint, headers.into_iter());
-
-        Ok(req.json(&body).send().await?.json::<T>().await?)
+        let res = req.json(&body).send().await?;
+        let full = res.bytes().await?;
+        match serde_json::from_slice(&full) {
+            Ok(data) => return Ok(data),
+            Err(e) => {
+                return Err(anyhow!(format!("Can't parse json. ReasonL {}. Text: {}", e, String::from_utf8(full.to_vec())?)))
+            },
+        }
     }
 
     pub async fn create_and_post_order(&self, order_args: &OrderArgs, order_type: OrderType) -> ClientResult<Value> {
